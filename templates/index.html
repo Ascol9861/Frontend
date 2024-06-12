@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        table td {
+            border: 1px solid;
+            text-align: center;
+            min-width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Python App</h1>
+        <form id="userForm" method="post">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody id="table_data_list">
+
+        </tbody>
+    </table>
+
+</body>
+
+<script>
+    const apiUrl = 'http://34.171.44.8/'; // Replace with your API URL
+    document.addEventListener('DOMContentLoaded', function () {
+
+        fetch(apiUrl+'users')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const tableBody = document.querySelector('#table_data_list');
+                const users = data.users;
+                users.forEach(userArray => {
+                    const row = document.createElement('tr');
+
+                    const idCell = document.createElement('td');
+                    idCell.textContent = userArray[0];
+                    row.appendChild(idCell);
+
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = userArray[1];
+                    row.appendChild(nameCell);
+
+                    const emailCell = document.createElement('td');
+                    emailCell.textContent = userArray[2];
+                    row.appendChild(emailCell);
+
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+    });
+
+    document.getElementById('userForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var formData = new FormData(this); // Create a FormData object from the form
+
+
+        fetch(apiUrl+'add_user', {
+            method: 'POST',
+            body: formData, // Send form data directly as FormData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                // Handle successful response, e.g., show a success message or update the UI
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle errors, e.g., show an error message to the user
+            });
+    });
+
+</script>
+
+</html>
